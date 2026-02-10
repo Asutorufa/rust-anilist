@@ -74,4 +74,68 @@ mod tests {
 
         assert_eq!(name.full(), Some("John Doe Smith".to_string()));
     }
+
+    #[test]
+    fn test_native() {
+        let name = Name {
+            first: Some("John".to_string()),
+            middle: Some("Doe".to_string()),
+            last: Some("Smith".to_string()),
+            full: Some("John Doe Smith".to_string()),
+            native: Some("ジョン ドウ スミス".to_string()),
+            alternative: vec!["Johnny".to_string()],
+            alternative_spoiler: Some(vec!["J.D.".to_string()]),
+            user_preferred: Some("John Smith".to_string()),
+        };
+
+        assert_eq!(name.native(), Some("ジョン ドウ スミス".to_string()));
+    }
+
+    #[test]
+    fn test_alternative() {
+        let name = Name {
+            first: Some("John".to_string()),
+            middle: Some("Doe".to_string()),
+            last: Some("Smith".to_string()),
+            full: Some("John Doe Smith".to_string()),
+            native: Some("ジョン ドウ スミス".to_string()),
+            alternative: vec!["Johnny".to_string()],
+            alternative_spoiler: Some(vec!["J.D.".to_string()]),
+            user_preferred: Some("John Smith".to_string()),
+        };
+
+        assert_eq!(name.alternative(), vec!["Johnny".to_string()]);
+    }
+
+    #[test]
+    fn test_spoiler() {
+        let name = Name {
+            first: Some("John".to_string()),
+            middle: Some("Doe".to_string()),
+            last: Some("Smith".to_string()),
+            full: Some("John Doe Smith".to_string()),
+            native: Some("ジョン ドウ スミス".to_string()),
+            alternative: vec!["Johnny".to_string()],
+            alternative_spoiler: Some(vec!["J.D.".to_string()]),
+            user_preferred: Some("John Smith".to_string()),
+        };
+
+        assert_eq!(name.spoiler(), Some(vec!["J.D.".to_string()]));
+    }
+
+    #[test]
+    fn test_user_preferred() {
+        let name = Name {
+            first: Some("John".to_string()),
+            middle: Some("Doe".to_string()),
+            last: Some("Smith".to_string()),
+            full: Some("John Doe Smith".to_string()),
+            native: Some("ジョン ドウ スミス".to_string()),
+            alternative: vec!["Johnny".to_string()],
+            alternative_spoiler: Some(vec!["J.D.".to_string()]),
+            user_preferred: Some("John Smith".to_string()),
+        };
+
+        assert_eq!(name.user_preferred(), Some("John Smith".to_string()));
+    }
 }

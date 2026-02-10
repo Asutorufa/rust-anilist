@@ -46,6 +46,7 @@ pub struct Character {
     /// The number of favorites the character has.
     pub favourites: Option<i64>,
     /// The voice actors of the character.
+    #[serde(default)]
     pub voice_actors: Option<Vec<Person>>,
     /// The moderator notes for the character.
     pub mod_notes: Option<String>,

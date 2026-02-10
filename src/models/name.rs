@@ -10,28 +10,21 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct Name {
     /// The first name.
-    #[serde(default)]
     pub first: Option<String>,
     /// The middle name, if any.
-    #[serde(default)]
     pub middle: Option<String>,
     /// The last name, if any.
-    #[serde(default)]
     pub last: Option<String>,
     /// The full name.
-    #[serde(default)]
     pub full: Option<String>,
     /// The native name, if any.
-    #[serde(default)]
     pub native: Option<String>,
     /// Alternative names.
     #[serde(default)]
     pub alternative: Vec<String>,
     /// Alternative names that may contain spoilers.
-    #[serde(default)]
     pub alternative_spoiler: Option<Vec<String>>,
     /// The name preferred by the user, if any.
-    #[serde(default)]
     pub user_preferred: Option<String>,
 }
 

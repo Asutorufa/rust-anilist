@@ -201,9 +201,11 @@ where
     D: Deserializer<'de>,
 {
     #[derive(Deserialize)]
+    #[serde(rename_all = "camelCase")]
     struct CharacterEdge {
         node: Character,
         role: Option<String>,
+        voice_actors: Option<Vec<Person>>,
     }
     #[derive(Deserialize)]
     struct CharacterConnection {
@@ -221,6 +223,9 @@ where
                     let mut character = edge.node;
                     if let Some(role_str) = edge.role {
                         character.role = Some(role_str.into());
+                    }
+                    if let Some(voice_actors) = edge.voice_actors {
+                        character.voice_actors = Some(voice_actors);
                     }
                     character
                 })

@@ -20,7 +20,6 @@ pub struct Name {
     /// The native name, if any.
     pub native: Option<String>,
     /// Alternative names.
-    #[serde(default)]
     pub alternative: Vec<String>,
     /// Alternative names that may contain spoilers.
     pub alternative_spoiler: Option<Vec<String>>,

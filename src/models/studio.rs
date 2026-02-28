@@ -27,7 +27,7 @@ pub struct Studio {
     /// Whether the studio is a favorite.
     pub is_favourite: Option<bool>,
     /// The number of favorites the studio has.
-    pub favourites: i64,
+    pub favourites: Option<i64>,
 }
 
 impl Studio {

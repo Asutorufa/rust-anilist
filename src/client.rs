@@ -358,35 +358,32 @@ impl Client {
     ///
     /// ```
     /// # async fn f(client: rust_anilist::Client) -> rust_anilist::Result<()> {
-    /// let animes = client.search_anime("Naruto", 1, 10).await.unwrap();
+    /// let animes = client.search_anime("Naruto", 1, 10).await?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn search_anime(&self, title: &str, page: u16, limit: u16) -> Option<Vec<Anime>> {
+    pub async fn search_anime(&self, title: &str, page: u16, limit: u16) -> Result<Vec<Anime>> {
         let result = self
             .request(
                 MediaType::Anime,
                 Action::Search,
                 serde_json::json!({ "search": title, "page": page, "per_page": limit, }),
             )
-            .await
-            .ok()?;
+            .await?;
+
+        let mut animes = Vec::new();
 
         if let Some(medias) = result["data"]["Page"]["media"].as_array() {
-            let mut animes = Vec::new();
-
             for media in medias.iter() {
                 if let Ok(mut anime) = serde_json::from_value::<Anime>(media.clone()) {
                     anime.client = self.clone();
                     animes.push(anime);
                 }
             }
-
-            return Some(animes);
         }
 
-        None
+        Ok(animes)
     }
 
     /// Search for mangas.
@@ -405,35 +402,32 @@ impl Client {
     ///
     /// ```
     /// # async fn f(client: rust_anilist::Client) -> rust_anilist::Result<()> {
-    /// let mangas = client.search_manga("Naruto", 1, 10).await.unwrap();
+    /// let mangas = client.search_manga("Naruto", 1, 10).await?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn search_manga(&self, title: &str, page: u16, limit: u16) -> Option<Vec<Manga>> {
+    pub async fn search_manga(&self, title: &str, page: u16, limit: u16) -> Result<Vec<Manga>> {
         let result = self
             .request(
                 MediaType::Manga,
                 Action::Search,
                 serde_json::json!({ "search": title, "page": page, "per_page": limit, }),
             )
-            .await
-            .ok()?;
+            .await?;
+
+        let mut mangas = Vec::new();
 
         if let Some(medias) = result["data"]["Page"]["media"].as_array() {
-            let mut mangas = Vec::new();
-
             for media in medias.iter() {
                 if let Ok(mut manga) = serde_json::from_value::<Manga>(media.clone()) {
                     manga.client = self.clone();
                     mangas.push(manga);
                 }
             }
-
-            return Some(mangas);
         }
 
-        None
+        Ok(mangas)
     }
 
     /// Search for users.
@@ -452,35 +446,32 @@ impl Client {
     ///
     /// ```
     /// # async fn f(client: rust_anilist::Client) -> rust_anilist::Result<()> {
-    /// let users = client.search_user("andrielfr", 1, 10).await.unwrap();
+    /// let users = client.search_user("andrielfr", 1, 10).await?;
     ///
     /// # Ok(())
     /// # }
     /// ```
-    pub async fn search_user(&self, name: &str, page: u16, limit: u16) -> Option<Vec<User>> {
+    pub async fn search_user(&self, name: &str, page: u16, limit: u16) -> Result<Vec<User>> {
         let result = self
             .request(
                 MediaType::User,
                 Action::Search,
                 serde_json::json!({ "search": name, "page": page, "per_page": limit, }),
             )
-            .await
-            .ok()?;
+            .await?;
+
+        let mut vec = Vec::new();
 
         if let Some(users) = result["data"]["Page"]["users"].as_array() {
-            let mut vec = Vec::new();
-
             for user in users.iter() {
                 if let Ok(mut user) = serde_json::from_value::<User>(user.clone()) {
                     user.client = self.clone();
                     vec.push(user);
                 }
             }
-
-            return Some(vec);
         }
 
-        None
+        Ok(vec)
     }
 
     /// Send a request to the AniList API.

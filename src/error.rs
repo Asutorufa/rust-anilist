@@ -24,4 +24,7 @@ pub enum Error {
     /// An error indicating that the API returned an invalid response.
     #[error("Failed to parse JSON")]
     JsonParseError(#[from] serde_json::Error),
+    /// An error indicating that the request failed.
+    #[error("http error: `{0}`")]
+    HttpError(#[from] reqwest::Error),
 }

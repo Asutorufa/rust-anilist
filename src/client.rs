@@ -3,13 +3,10 @@
 
 //! This module contains the `Client` struct and its related types.
 
-use serde::Deserialize;
 use std::time::Duration;
 
 use crate::{
-    models::{
-        Anime, Character, Cover, Format, Image, Manga, MediaType, Person, Status, Title, User,
-    },
+    models::{Anime, Character, Manga, MediaType, Person, User},
     Error, Result,
 };
 
@@ -374,30 +371,16 @@ impl Client {
                 serde_json::json!({ "search": title, "page": page, "per_page": limit, }),
             )
             .await
-            .map_err(|e| Error::ApiError(e.to_string()))
-            .unwrap();
+            .ok()?;
 
         if let Some(medias) = result["data"]["Page"]["media"].as_array() {
             let mut animes = Vec::new();
 
             for media in medias.iter() {
-                animes.push(Anime {
-                    id: media["id"].as_i64().unwrap(),
-                    id_mal: media["idMal"].as_i64(),
-                    title: Title::deserialize(&media["title"]).unwrap(),
-                    format: Format::deserialize(&media["format"]).unwrap(),
-                    status: Status::deserialize(&media["status"]).unwrap(),
-                    description: media["description"].as_str().unwrap().to_string(),
-                    cover: Cover::deserialize(&media["coverImage"]).unwrap(),
-                    banner: media["bannerImage"].as_str().map(String::from),
-                    average_score: media["averageScore"].as_u64().map(|x| x as u8),
-                    mean_score: media["meanScore"].as_u64().map(|x| x as u8),
-                    is_adult: media["isAdult"].as_bool().unwrap(),
-                    url: media["siteUrl"].as_str().unwrap().to_string(),
-
-                    client: self.clone(),
-                    ..Default::default()
-                });
+                if let Ok(mut anime) = serde_json::from_value::<Anime>(media.clone()) {
+                    anime.client = self.clone();
+                    animes.push(anime);
+                }
             }
 
             return Some(animes);
@@ -435,30 +418,16 @@ impl Client {
                 serde_json::json!({ "search": title, "page": page, "per_page": limit, }),
             )
             .await
-            .map_err(|e| Error::ApiError(e.to_string()))
-            .unwrap();
+            .ok()?;
 
         if let Some(medias) = result["data"]["Page"]["media"].as_array() {
             let mut mangas = Vec::new();
 
             for media in medias.iter() {
-                mangas.push(Manga {
-                    id: media["id"].as_i64().unwrap(),
-                    id_mal: media["idMal"].as_i64(),
-                    title: Title::deserialize(&media["title"]).unwrap(),
-                    format: Format::deserialize(&media["format"]).unwrap(),
-                    status: Status::deserialize(&media["status"]).unwrap(),
-                    description: media["description"].as_str().unwrap().to_string(),
-                    cover: Cover::deserialize(&media["coverImage"]).unwrap(),
-                    banner: media["bannerImage"].as_str().map(String::from),
-                    average_score: media["averageScore"].as_u64().map(|x| x as u8),
-                    mean_score: media["meanScore"].as_u64().map(|x| x as u8),
-                    is_adult: media["isAdult"].as_bool().unwrap(),
-                    url: media["siteUrl"].as_str().unwrap().to_string(),
-
-                    client: self.clone(),
-                    ..Default::default()
-                });
+                if let Ok(mut manga) = serde_json::from_value::<Manga>(media.clone()) {
+                    manga.client = self.clone();
+                    mangas.push(manga);
+                }
             }
 
             return Some(mangas);
@@ -496,23 +465,16 @@ impl Client {
                 serde_json::json!({ "search": name, "page": page, "per_page": limit, }),
             )
             .await
-            .map_err(|e| Error::ApiError(e.to_string()))
-            .unwrap();
+            .ok()?;
 
         if let Some(users) = result["data"]["Page"]["users"].as_array() {
             let mut vec = Vec::new();
 
             for user in users.iter() {
-                vec.push(User {
-                    id: user["id"].as_i64().unwrap() as i32,
-                    name: user["name"].as_str().unwrap().to_string(),
-                    about: user["about"].as_str().map(String::from),
-                    avatar: Image::deserialize(&user["avatar"]).ok(),
-                    banner: user["bannerImage"].as_str().map(String::from),
-
-                    client: self.clone(),
-                    ..Default::default()
-                });
+                if let Ok(mut user) = serde_json::from_value::<User>(user.clone()) {
+                    user.client = self.clone();
+                    vec.push(user);
+                }
             }
 
             return Some(vec);
@@ -537,8 +499,8 @@ impl Client {
         media_type: MediaType,
         action: Action,
         variables: serde_json::Value,
-    ) -> std::result::Result<serde_json::Value, reqwest::Error> {
-        let query = Client::get_query(media_type, action).unwrap();
+    ) -> Result<serde_json::Value> {
+        let query = Client::get_query(media_type, action)?;
         let json = serde_json::json!({"query": query, "variables": variables});
         let mut body = reqwest::Client::new()
             .post("https://graphql.anilist.co/")
@@ -552,7 +514,7 @@ impl Client {
         }
 
         let response = body.send().await?.text().await?;
-        let result = serde_json::from_str::<serde_json::Value>(&response).unwrap();
+        let result = serde_json::from_str::<serde_json::Value>(&response)?;
 
         Ok(result)
     }

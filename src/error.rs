@@ -27,4 +27,7 @@ pub enum Error {
     /// An error indicating that the request failed.
     #[error("http error: `{0}`")]
     HttpError(#[from] reqwest::Error),
+    /// An error indicating that the media type or action is not supported.
+    #[error("unsupported media type or action")]
+    UnsupportedMediaType,
 }

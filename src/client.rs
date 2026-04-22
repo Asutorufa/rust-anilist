@@ -532,7 +532,7 @@ impl Client {
                     MediaType::User => include_str!("../queries/get_user.graphql").to_string(),
                     MediaType::Person => include_str!("../queries/get_person.graphql").to_string(),
                     // MediaType::Studio => include_str!("../queries/get_studio.graphql").to_string(),
-                    _ => unimplemented!(),
+                    _ => return Err(Error::UnsupportedMediaType),
                 }
             }
             Action::Search => {
@@ -547,7 +547,7 @@ impl Client {
                     //     include_str!("../queries/search_person.graphql").to_string()
                     // }
                     // MediaType::Studio => include_str!("../queries/search_studio.graphql").to_string(),
-                    _ => unimplemented!(),
+                    _ => return Err(Error::UnsupportedMediaType),
                 }
             }
         };
